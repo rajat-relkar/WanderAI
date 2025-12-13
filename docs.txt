@@ -44,11 +44,40 @@ cmd >>>
     git init
     create github repo
 
+    # rename master to main
+    git branch -M main
+    git push -u origin main
+
     git branch -M main
     git remote add origin https://github.com/rajat-relkar/Anime-Recommender-System.git
     git add .
     git commit -m "commit"
     git push -u origin main
+
+----
+>>> k8s-deployment.yaml
+
+>>> filebeat.yaml
+    This YAML deploys Filebeat on Kubernetes using a DaemonSet, so that every node runs one Filebeat pod 
+    that collects container logs and ships them to Logstash.
+
+>>> logstash.yaml
+
+>>> kibana.yaml
+
+
+----
+info - 
+- input from filebeat will be received on 5044 port by logstash
+- logstash data will be sent to elasticsearch on 9200 port
+- logstash will have 2 ports. 5044 for filebeat input and 9600 for logstash monitoring api
+
+- elasticsearch will be used to store indexes inside the PersistentVolumeClaim
+
+- ELK(elasticsearch, logstash, kibana) Stack with Firebeat.
+
+
+
 
 
 ---- 
