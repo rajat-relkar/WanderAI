@@ -36,7 +36,7 @@
 =================== Deployment ====================
 
 1. Setup Dockerfile
-2. llmops-k8s.yaml -> contains Deployment as well as service file seperated by --- 
+2. k8s-deployment.yaml -> contains Deployment as well as service file seperated by --- 
 3. .gitignore
 
 cmd >>>
@@ -76,20 +76,7 @@ info -
 
 - ELK(elasticsearch, logstash, kibana) Stack with Firebeat.
 
-
-
-
-
----- 
-. Initial Setup
-Push code to GitHub
-Push your project code to a GitHub repository.
-
-Create a Dockerfile
-Write a Dockerfile in the root of your project to containerize the app.
-
-Create Kubernetes Deployemtn file
-Make a file named 'llmops-k8s.yaml'
+---
 
 Create a VM Instance on Google Cloud
 
@@ -106,10 +93,11 @@ Networking:
 Enable HTTP and HTTPS traffic
 Create the Instance
 
-Connect to the VM
+Connect to the VM by clicking on SSH
 
 Use the SSH option provided to connect to the VM from the browser.
     -> in-browser window will popup
+        # first install docker inside our VM
         Run following commands:
             # Add Docker's official GPG key:
         sudo apt update
@@ -174,9 +162,7 @@ Use the SSH option provided to connect to the VM from the browser.
         Install Minikube Binary on VM
 
         Copy and paste the installation commands from the website into your VM terminal
-        Start Minikube Cluster
-
-        minikube start
+        Start Minikube Cluster cmd - minikube start
         This uses Docker internally, which is why Docker was installed first
 
         --- kubectl installation
@@ -187,14 +173,15 @@ Use the SSH option provided to connect to the VM from the browser.
         Run the second command to validate the download
         Instead of installing manually, go to the Snap section (below on the same page)
         sudo snap install kubectl --classic
-        Verify installation:
+        
+        Verify installation: kubectl version --client
 
-        kubectl version --client
+
 
         --- connect github inside VM - so whenever changes from local system are pushed to github and
             pulled in VM, it will be visible.
-        git clone https://github.com/rajat-relkar/Anime-Recommender-System.git
-        cd Anime-Recommender-System
+        git clone https://github.com/rajat-relkar/WanderAI.git
+        cd WanderAI
 
         git config --global user.email "relkarrajat@gmail.com"
         git config --global user.name "rajat-relkar"
@@ -204,48 +191,55 @@ Use the SSH option provided to connect to the VM from the browser.
         git push origin main
 
         Now it will ask for github username and password. For password, generate a github token.
-         To pull latest changes from github to vm - git pull origin main
+        pwd - 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
+
+        To pull latest changes from github to vm - git pull origin main
 
         
 --- GCP Firewall setup
     Got to firewall on Google Cloud
     Create firewall rule.
 
+
+
 --- Build and Deploy your APP on VM
     ## Point Docker to Minikube
     eval $(minikube docker-env)
 
-    docker build -t llmops-app:latest .
+    docker build -t streamlit-app:latest .
 
     To check if image has been built - docker images
-    llmops-app:latest will be visible
+    streamlit-app:latest will be visible
 
     # Below cmd's inject secret keys inside our kubernetes Cluster
     kubectl create secret generic llmops-secrets \
-    --from-literal=GROQ_API_KEY="" \
-    --from-literal=HUGGINGFACEHUB_API_TOKEN=""
+    --from-literal=GROQ_API_KEY="" 
 
-    kubectl apply -f llmops-k8s.yaml
+    kubectl apply -f k8s-deployment.yaml
 
-    kubectl get pods
+    kubectl get pods # to check if pods are running or not
 
-    ### U will see pods runiing
+    ### U will see pods running
 
+    # to access our application via internet, use following cmd
+    kubectl port-forward svc/streamlit-service 8501:80 --address 0.0.0.0
 
-    # Do minikube tunnel on one terminal
-
-    minikube tunnel
-
-    # by executing the above cmd, we can access our application from outside too.
+    ## Now copy external ip and :5000 and see ur app there....
+    34.58.166.65:8501
 
 
-    # Open another terminal
+!!!! ELK Stack Setup on Kubernetes with Filebeat - Step-by-Step Guide
+--- Connect to new SSH terminal
+    view existing namespaces - kubectl get ns
+    create new namespace - kubectl create namespace logging
 
-    kubectl get svc - this will show our llmops-service
+    kubectl apply -f elasticsearch.yaml
 
-    kubectl port-forward svc/llmops-service 8501:80 --address 0.0.0.0
+    kubectl get pvc -n logging --- status should be BOUND
 
-    ## Now copy external ip(written before ssh connect) and :8501 and see ur app there....
+    kubectl get pv -n logging --- status should be BOUND
+
+
 
 
 

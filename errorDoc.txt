@@ -1,0 +1,12 @@
+1. The CrashLoopBackOff is a very common Elasticsearch issue.
+    - I create a namespace logging. While deploying elasticsearch for this namespace, the pod was not running and
+    its status was CrashLoopBackOff. 
+    
+    How I solved it?
+    - In elasticsearch.yaml file, I updated the elasticsearch image
+    code line in env:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.16
+    value: "-Xms1g -Xmx1g -XX:-UseContainerSupport"
+
+    - Elasticsearch 7.17 crashes on cgroup v2 due to a JDK container metrics bug; 
+      disabling JVM container support or upgrading Elasticsearch resolves the issue.
