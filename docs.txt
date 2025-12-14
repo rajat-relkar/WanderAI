@@ -191,7 +191,6 @@ Use the SSH option provided to connect to the VM from the browser.
         git push origin main
 
         Now it will ask for github username and password. For password, generate a github token.
-        pwd - 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
 
         To pull latest changes from github to vm - git pull origin main
 
