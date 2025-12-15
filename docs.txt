@@ -223,7 +223,7 @@ Use the SSH option provided to connect to the VM from the browser.
     # to access our application via internet, use following cmd
     kubectl port-forward svc/streamlit-service 8501:80 --address 0.0.0.0
 
-    ## Now copy external ip and :5000 and see ur app there....
+    ## Now copy external ip and :8501 and see ur app there....
     34.58.166.65:8501
 
 
