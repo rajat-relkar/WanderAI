@@ -1,0 +1,265 @@
+1. -- Environment Setup
+    python -m venv venv
+    source venv/bin/activate
+    requirements.txt
+
+2. -- Create .env file
+    Inside it, specify groq api key from groq cloud and also mention hugging face token in write mode(if applicable)
+
+3. -- setup.py file
+    To trigger this file, run pip install -e .
+    imp - Inside the required folders create __init__.py file and run again pip install -e . to treat them as package
+
+4. -- src folder
+        - __init__.py
+
+        utils folder
+            - __init__.py
+
+            - logger.py
+
+            - custom_exception.py
+
+        config folder
+            - __init__.py
+            - config.py --> loads env variables, specify the model name from the groq cloud
+
+        core folder
+            - __init__.py
+
+        chains folder
+            - __init__.py
+
+5. -- app.py file
+
+
+=================== Deployment ====================
+
+1. Setup Dockerfile
+2. k8s-deployment.yaml -> contains Deployment as well as service
+3. .gitignore
+
+cmd >>>
+
+    git init
+    create github repo
+
+    # rename master to main
+    git branch -M main
+    git push -u origin main
+
+    git branch -M main
+    git remote add origin https://github.com/rajat-relkar/WanderAI.git
+    git add .
+    git commit -m "commit"
+    git push -u origin main
+
+----
+>>> k8s-deployment.yaml
+
+>>> filebeat.yaml
+    This YAML deploys Filebeat on Kubernetes using a DaemonSet, so that every node runs one Filebeat pod 
+    that collects container logs and ships them to Logstash.
+
+>>> logstash.yaml
+
+>>> kibana.yaml
+
+----
+info - 
+- input from filebeat will be received on 5044 port by logstash
+- logstash data will be sent to elasticsearch on 9200 port
+- logstash will have 2 ports. 5044 for filebeat input and 9600 for logstash monitoring api
+
+- elasticsearch will be used to store indexes inside the PersistentVolumeClaim
+
+- ELK(elasticsearch, logstash, kibana) Stack with Firebeat.
+
+
+---- 
+. Initial Setup
+Push code to GitHub
+Push your project code to a GitHub repository.
+
+Create a Dockerfile
+Write a Dockerfile in the root of your project to containerize the app.
+
+Create Kubernetes Deployemtn file
+Make a file named 'k8s-deployment.yaml'
+
+Create a VM Instance on Google Cloud
+
+Go to VM Instances and click "Create Instance"
+Name: ``
+Machine Type:
+Series: E2
+Preset: Standard
+Memory: 16 GB RAM
+Boot Disk:
+Change size to 256 GB
+Image: Select Ubuntu 24.04 LTS
+Networking:
+Enable HTTP and HTTPS traffic
+Create the Instance
+
+Connect to the VM
+
+Use the SSH option provided to connect to the VM from the browser.
+    -> in-browser window will popup
+        Run following commands:
+            # Add Docker's official GPG key:
+        sudo apt update
+        sudo apt install ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources:
+        sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+        Types: deb
+        URIs: https://download.docker.com/linux/ubuntu
+        Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+        Components: stable
+        Signed-By: /etc/apt/keyrings/docker.asc
+        EOF
+
+        sudo apt update
+
+        sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+        --- 
+        Install Docker
+
+        Search: "Install Docker on Ubuntu"
+
+        Open the first official Docker website (docs.docker.com)
+
+        Scroll down and copy the first big command block and paste into your VM terminal
+
+        Then copy and paste the second command block
+
+        Then run the third command to test Docker:
+
+        docker run hello-world
+        Run Docker without sudo
+
+        On the same page, scroll to: "Post-installation steps for Linux"
+        Paste all 4 commands one by one to allow Docker without sudo
+        Last command is for testing
+
+        ---
+        Enable Docker to start on boot
+
+        On the same page, scroll down to: "Configure Docker to start on boot"
+
+        Copy and paste the command block (2 commands):
+
+        sudo systemctl enable docker.service
+        sudo systemctl enable containerd.service
+
+        --- Minikube installation
+        Install Minikube
+
+        Open browser and search: Install Minikube
+        Open the first official site (minikube.sigs.k8s.io) with minikube start on it
+        Choose:
+        OS: Linux
+        Architecture: x86
+        Select Binary download
+        Reminder: You have already done this on Windows, so you're familiar with how Minikube works
+        Install Minikube Binary on VM
+
+        Copy and paste the installation commands from the website into your VM terminal
+        Start Minikube Cluster
+
+        minikube start
+        This uses Docker internally, which is why Docker was installed first
+
+        --- kubectl installation
+        Install kubectl
+
+        Search: Install kubectl
+        Run the first command with curl from the official Kubernetes docs
+        Run the second command to validate the download
+        Instead of installing manually, go to the Snap section (below on the same page)
+        sudo snap install kubectl --classic
+        Verify installation:
+
+        kubectl version --client
+
+        --- connect github inside VM - so whenever changes from local system are pushed to github and
+            pulled in VM, it will be visible.
+
+        git clone https://github.com/rajat-relkar/WanderAI.git
+        cd WanderAI
+
+        git config --global user.email "relkarrajat@gmail.com"
+        git config --global user.name "rajat-relkar"
+
+        git add .
+        git commit -m "commit"
+        git push origin main
+
+        Now it will ask for github username and password. For password, generate a github token.
+
+        To pull latest changes from github to vm - git pull origin main
+
+        
+--- GCP Firewall setup
+    Got to firewall on Google Cloud
+    Create firewall rule.
+
+--- Build and Deploy your APP on VM
+    ## Point Docker to Minikube
+    eval $(minikube docker-env)
+
+    docker build -t streamlit-app:latest .
+
+    To check if image has been built - docker images
+    streamlit-app:latest will be visible
+
+    # Below cmd's inject secret keys inside our kubernetes Cluster
+    kubectl create secret generic llmops-secrets \
+    --from-literal=GROQ_API_KEY=""
+
+    kubectl apply -f llmops-k8s.yaml
+
+    kubectl get pods
+
+    ### U will see pods runiing
+
+
+    # Do minikube tunnel on one terminal
+
+    minikube tunnel
+
+    # by executing the above cmd, we can access our application from outside too.
+
+
+    # Open another terminal
+
+    kubectl get svc - this will show our llmops-service
+
+    kubectl port-forward svc/llmops-service 8501:80 --address 0.0.0.0
+
+    ## Now copy external ip and :8501 and see ur app there....
+
+
+!!!! ELK Stack Setup on Kubernetes with Filebeat - Step-by-Step Guide
+--- Connect to new SSH terminal
+    view existing namespaces - kubectl get ns
+
+    create new namespace - kubectl create namespace logging
+
+    kubectl apply -f elasticsearch.yaml
+
+    kubectl get pvc -n logging --- status should be BOUND
+
+    kubectl get pv -n logging --- status should be BOUND
+
+    --- For rest deployment process refer to documentation.md
+
+
+
+
+
