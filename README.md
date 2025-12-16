@@ -21,13 +21,7 @@ The application is built using **LangChain + Groq LLM**, deployed via **Docker &
 
 ## High-Level Architecture
 
-User → Streamlit UI → LangChain → Groq LLM  
-                 ↓  
-             Docker Container  
-                 ↓  
-             Kubernetes (Minikube)  
-                 ↓  
-     Filebeat → Logstash → Elasticsearch → Kibana
+ <img width="1350" height="811" alt="AI+travel+planner+Workflow" src="https://github.com/user-attachments/assets/17d8c285-6c5b-440f-accf-5776811eaea2" />
 
 ---
 
