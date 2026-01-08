@@ -95,7 +95,7 @@ The final phase involves deploying the application and setting up the monitoring
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 WanderAI/
@@ -129,13 +129,13 @@ WanderAI/
 
 ---
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
 All application and Kubernetes logs are collected using **Filebeat**, processed by **Logstash**, stored in **Elasticsearch**, and visualized in **Kibana**.
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
 - AI-based travel planning
 - LLM-powered recommendation systems
